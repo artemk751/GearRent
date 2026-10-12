@@ -1,115 +1,54 @@
-# web-programming-2026-template
+# GearRent
+- Це вебплатформа для оренди та прокату спорядження для активного відпочинку, туризму, спорту та фото або відеозйомки.
 
-A reusable Django project with no bundled application, SQLite, and Django's
-standard admin, authentication, sessions, messages, and staticfiles support.
+Застосунок вирішує проблему високої вартості купівлі дорогого обладнання для разових поїздок чи хобі. На сайті користувачі можуть переглядати каталог доступного спорядження, шукати товари за назвою, фільтрувати їх за категоріями, брендами та ціною оренди за добу, а також переглядати детальні характеристики товарів та інформацію про бренд або категорію.
 
-## Local setup
+## REST API Endpoints (`/api/v1`)
 
-Requires the latest patch release of Python 3.12, 3.13, or 3.14. Run these commands from the project directory containing
-`manage.py`.
+Усі дані передаються у форматі **JSON**.
 
-1. Create and activate a virtual environment:
+### Товари (`/products`)
+* `GET /products` — Отримати каталог (query: `search`, `category_id`, `brand_id`, `sort_by`).  
+  * **Status:** `200 OK` | **Res:** `[{"id": 1, "name": "Намет", "price_per_day": 250.0, "is_available": true}]`
+* `GET /products/{id}` — Деталі товару.  
+  * **Status:** `200 OK` | **Res:** `{"id": 1, "name": "Намет", "description": "2-місний", "price_per_day": 250.0}`
+* `POST /products` — Додати товар (Admin).  
+  * **Req:** `{"name": "Рюкзак", "price_per_day": 180.0, "category_id": 1, "brand_id": 3}`  
+  * **Status:** `201 Created` | **Res:** `{"id": 2, "name": "Рюкзак", "price_per_day": 180.0}`
+* `PUT /products/{id}` — Оновити товар (Admin).  
+  * **Req:** `{"name": "Рюкзак Pro", "price_per_day": 200.0}`  
+  * **Status:** `200 OK` | **Res:** `{"id": 2, "name": "Рюкзак Pro", "price_per_day": 200.0}`
+* `DELETE /products/{id}` — Видалити товар (Admin).  
+  * **Status:** `204 No Content`
 
-   ```bash
-   python -m venv .venv
-   
-   # for linux/macos
-   source .venv/bin/activate
-   # for Windows:
-   .venv\Scripts\activate
-   ```
-
-2. Install dependencies:
-
-   ```bash
-   python -m pip install -r requirements-dev.txt
-   ```
-
-
-3. Apply migrations to create the local SQLite database:
-
-   ```bash
-   python manage.py migrate
-   ```
-
-4. Start the development server:
-
-   ```bash
-   python manage.py runserver
-   ```
-
-## Endpoints
-
-With the server running at `http://127.0.0.1:8000`:
-
-| URL | Behavior |
-| --- | --- |
-| http://127.0.0.1:8000/ | No application homepage; may show Django's development welcome page while `DEBUG = True` |
-| http://127.0.0.1:8000/admin/ | Django admin, available after applying migrations |
-
-With `DEBUG = False`, unmatched URLs such as `/` return HTTP 404.
-
-To create an account for admin login, run this after applying migrations:
-
-```bash
-python manage.py createsuperuser
-```
-
-## Add your first application
-
-1. Create an app from the directory containing `manage.py` (replace `myapp`
-   with your application name):
-
-   ```bash
-   python manage.py startapp myapp
-   ```
-
-2. Add its generated configuration class, `myapp.apps.MyappConfig`, to
-   `INSTALLED_APPS` in `config/settings.py`.
-3. Define your views and create `myapp/urls.py` with their URL patterns.
-4. Register that URLconf in `config/urls.py` using `path()` and `include()`,
-   choosing a URL prefix for the app and retaining the admin route.
-
-See the official Django 6.1 tutorial for
-[views and URL registration](https://docs.djangoproject.com/en/6.1/intro/tutorial01/)
-and [app registration and models](https://docs.djangoproject.com/en/6.1/intro/tutorial02/).
-
-## Git attributes
-
-Git detects text files automatically and normalizes them to LF. Checkouts use
-LF on Linux and Windows, while `.bat` and `.cmd` files use CRLF. Binary files
-are auto-detected and left unchanged, helping avoid newline-only diffs.
+### Категорії (`/categories`)
+* `GET /categories` — Список категорій.  
+  * **Status:** `200 OK` | **Res:** `[{"id": 1, "name": "Намети"}]`
+* `GET /categories/{id}/products` — Товари категорії.  
+  * **Status:** `200 OK` | **Res:** `[{"id": 1, "name": "Намет", "price_per_day": 250.0}]`
+* `POST /categories` — Створити категорію (Admin).  
+  * **Req:** `{"name": "Альпінізм"}`  
+  * **Status:** `201 Created` | **Res:** `{"id": 2, "name": "Альпінізм"}`
 
 
-## Code style and submission verification
+### Авторизація та Користувачі (`/auth`, `/users`)
+* `POST /auth/register` — Реєстрація.  
+  * **Req:** `{"email": "user@test.com", "password": "123", "full_name": "Іван", "phone": "+380970000000"}`  
+  * **Status:** `201 Created` | **Res:** `{"id": 1, "email": "user@test.com"}`
+* `POST /auth/login` — Вхід у систему.  
+  * **Req:** `{"email": "user@test.com", "password": "123"}`  
+  * **Status:** `200 OK` | **Res:** `{"token": "jwt_token", "user": {"id": 1, "email": "user@test.com"}}`
+* `GET /users/me` — Профіль користувача.  
+  * **Status:** `200 OK` | **Res:** `{"id": 1, "email": "user@test.com", "full_name": "Іван"}`
+* `PATCH /users/me` — Оновити профіль.  
+  * **Req:** `{"full_name": "Іван Петренко"}`  
+  * **Status:** `200 OK` | **Res:** `{"id": 1, "full_name": "Іван Петренко"}`
 
-All submissions are required to adhere to PEP-8, Django best practices, and standard HTML/CSS/JS formatting. A deterministic cross-platform utility is provided to help you check and format your code.
+### Замовлення (`/orders`)
+* `POST /orders` — Оформити замовлення.  
+  * **Req:** `{"items": [{"product_id": 1, "rental_days": 3}]}`  
+  * **Status:** `201 Created` | **Res:** `{"order_id": 101, "status": "created", "total_price": 750.0}`
+* `GET /users/me/orders` — Історія замовлень.  
+  * **Status:** `200 OK` | **Res:** `[{"order_id": 101, "total_price": 750.0, "items": [{"product_id": 1, "rental_days": 3}]}]`
 
-### 1. Verification (Check Mode)
-Before submitting, verify that all files adhere to the required standards:
-
-```bash
-python check_submission.py
-```
-
-If all checks pass, you are ready to submit! If any checks fail, review the error output or run the auto-formatter below.
-
-### 2. Auto-Formatting
-To automatically format Python files, fix safe PEP-8 rules, format Django HTML templates, and format CSS/JS static files:
-
-```bash
-python check_submission.py --format
-```
-
-### 3. PyCharm Integration
-If you use PyCharm:
-- **One-Click Run:** In the top-right toolbar run configurations dropdown, select **"Verify Submission"** or **"Format Project"** and click the green **Play** button.
-
-## Development only
-
-The included settings use `DEBUG = True`, a development secret key, and a local
-SQLite database. The default mailer uses the console backend: email is printed
-to the process's console instead of being delivered.
-
-This configuration and Django's development server are not suitable for
-production deployment.
+  ![alt text](image.png)
