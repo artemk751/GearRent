@@ -1,0 +1,1638 @@
+{
+  "info": {
+    "name": "GearRent API",
+    "description": "CRUD для товарів, категорій і брендів. Запускайте папки по порядку: змінні category_id, brand_id, product_id зберігаються автоматично.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000/api/v1"
+    },
+    {
+      "key": "category_id",
+      "value": ""
+    },
+    {
+      "key": "brand_id",
+      "value": ""
+    },
+    {
+      "key": "product_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Категорії",
+      "item": [
+        {
+          "name": "Успішні запити",
+          "item": [
+            {
+              "name": "Створити категорію",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/categories",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "categories"
+                  ]
+                },
+                "description": "Створює категорію. 201.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Альпінізм\",\n  \"description\": \"Спорядження для сходжень\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [
+                {
+                  "name": "201 Created",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/categories",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "categories"
+                      ]
+                    },
+                    "description": "Створює категорію. 201.",
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"name\": \"Альпінізм\",\n  \"description\": \"Спорядження для сходжень\"\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"id\": 5,\n  \"name\": \"Альпінізм\",\n  \"description\": \"Спорядження для сходжень\"\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "pm.collectionVariables.set('category_id', json.id);",
+                      "pm.test('201 Created', () => pm.response.to.have.status(201));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Список категорій",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/categories",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "categories"
+                  ]
+                },
+                "description": "Повертає масив категорій. 200."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Категорія за id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/categories/{{category_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "categories",
+                    "{{category_id}}"
+                  ]
+                },
+                "description": "Одна категорія. 200."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Товари категорії",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/categories/{{category_id}}/products",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "categories",
+                    "{{category_id}}",
+                    "products"
+                  ]
+                },
+                "description": "Товари категорії (може бути порожній масив). 200."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Оновити категорію (PUT)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/categories/{{category_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "categories",
+                    "{{category_id}}"
+                  ]
+                },
+                "description": "Повне оновлення. 200.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Альпінізм і скелелазіння\",\n  \"description\": \"Оновлений опис\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Оновити категорію частково (PATCH)",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/categories/{{category_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "categories",
+                    "{{category_id}}"
+                  ]
+                },
+                "description": "Часткове оновлення. 200.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"description\": \"Лише опис\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Помилки",
+          "item": [
+            {
+              "name": "ПОМИЛКА 400: порожня назва",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/categories",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "categories"
+                  ]
+                },
+                "description": "Валідація: назва не може бути порожньою.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [
+                {
+                  "name": "400 Bad Request",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/categories",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "categories"
+                      ]
+                    },
+                    "description": "Валідація: назва не може бути порожньою.",
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"name\": \"\"\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "status": "Bad Request",
+                  "code": 400,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"error\": {\n    \"code\": \"bad_request\",\n    \"message\": \"Передані дані некоректні. Перевірте поля в details та виправте помилки.\",\n    \"details\": {\n      \"name\": [\n        \"Це поле не може бути порожнім.\"\n      ]\n    }\n  }\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                      "pm.test('Єдиний формат помилки', () => pm.expect(pm.response.json().error.code).to.eql('bad_request'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "ПОМИЛКА 409: дубль назви",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/categories",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "categories"
+                  ]
+                },
+                "description": "Категорія з такою назвою вже існує (без урахування регістру).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"намети\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [
+                {
+                  "name": "409 Conflict",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/categories",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "categories"
+                      ]
+                    },
+                    "description": "Категорія з такою назвою вже існує (без урахування регістру).",
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"name\": \"намети\"\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "status": "Conflict",
+                  "code": 409,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"error\": {\n    \"code\": \"conflict\",\n    \"message\": \"Категорія з назвою «намети» вже існує. Оберіть іншу назву.\"\n  }\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 409', () => pm.response.to.have.status(409));",
+                      "pm.test('Єдиний формат помилки', () => pm.expect(pm.response.json().error.code).to.eql('conflict'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "ПОМИЛКА 404: категорії не існує",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/categories/9999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "categories",
+                    "9999"
+                  ]
+                },
+                "description": "Неіснуючий id."
+              },
+              "response": [
+                {
+                  "name": "404 Not Found",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base_url}}/categories/9999",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "categories",
+                        "9999"
+                      ]
+                    },
+                    "description": "Неіснуючий id."
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"error\": {\n    \"code\": \"not_found\",\n    \"message\": \"Категорія з id=9999 не знайдено.\"\n  }\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Єдиний формат помилки', () => pm.expect(pm.response.json().error.code).to.eql('not_found'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "ПОМИЛКА 409: видалити категорію з товарами",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/categories/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "categories",
+                    "1"
+                  ]
+                },
+                "description": "Категорію «Намети» (id=1, демо-дані) не можна видалити, поки в ній є товари."
+              },
+              "response": [
+                {
+                  "name": "409 Conflict",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base_url}}/categories/1",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "categories",
+                        "1"
+                      ]
+                    },
+                    "description": "Категорію «Намети» (id=1, демо-дані) не можна видалити, поки в ній є товари."
+                  },
+                  "status": "Conflict",
+                  "code": 409,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"error\": {\n    \"code\": \"conflict\",\n    \"message\": \"Неможливо видалити категорію «Намети», оскільки за нею закріплено 2 товари. Спершу видаліть ці товари або перенесіть їх в іншу категорію.\"\n  }\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 409', () => pm.response.to.have.status(409));",
+                      "pm.test('Єдиний формат помилки', () => pm.expect(pm.response.json().error.code).to.eql('conflict'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Видалити порожню категорію",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/categories/{{category_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "categories",
+                    "{{category_id}}"
+                  ]
+                },
+                "description": "Категорія без товарів видаляється. 204."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 204', () => pm.response.to.have.status(204));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Бренди",
+      "item": [
+        {
+          "name": "Успішні запити",
+          "item": [
+            {
+              "name": "Створити бренд",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/brands",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "brands"
+                  ]
+                },
+                "description": "Створює бренд. 201.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Salewa\",\n  \"description\": \"Італійський бренд гірського спорядження\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "pm.collectionVariables.set('brand_id', json.id);",
+                      "pm.test('201 Created', () => pm.response.to.have.status(201));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Список брендів",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/brands",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "brands"
+                  ]
+                },
+                "description": "Масив брендів. 200."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Бренд за id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/brands/{{brand_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "brands",
+                    "{{brand_id}}"
+                  ]
+                },
+                "description": "Один бренд. 200."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Товари бренду",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/brands/{{brand_id}}/products",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "brands",
+                    "{{brand_id}}",
+                    "products"
+                  ]
+                },
+                "description": "Товари бренду. 200."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Оновити бренд (PUT)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/brands/{{brand_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "brands",
+                    "{{brand_id}}"
+                  ]
+                },
+                "description": "Повне оновлення. 200.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Salewa Italia\",\n  \"description\": \"Оновлений опис\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Видалити бренд без товарів",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/brands/{{brand_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "brands",
+                    "{{brand_id}}"
+                  ]
+                },
+                "description": "204."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 204', () => pm.response.to.have.status(204));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Помилки",
+          "item": [
+            {
+              "name": "ПОМИЛКА 409: видалити бренд з товарами",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/brands/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "brands",
+                    "1"
+                  ]
+                },
+                "description": "Бренд «Husky» (id=1, демо-дані) має товари."
+              },
+              "response": [
+                {
+                  "name": "409 Conflict",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base_url}}/brands/1",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "brands",
+                        "1"
+                      ]
+                    },
+                    "description": "Бренд «Husky» (id=1, демо-дані) має товари."
+                  },
+                  "status": "Conflict",
+                  "code": 409,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"error\": {\n    \"code\": \"conflict\",\n    \"message\": \"Неможливо видалити бренд «Husky», оскільки за ним закріплено 2 товари. Спершу видаліть ці товари або перенесіть їх до іншого бренду.\"\n  }\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 409', () => pm.response.to.have.status(409));",
+                      "pm.test('Єдиний формат помилки', () => pm.expect(pm.response.json().error.code).to.eql('conflict'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "ПОМИЛКА 404: бренду не існує",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/brands/9999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "brands",
+                    "9999"
+                  ]
+                },
+                "description": "Неіснуючий id."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Єдиний формат помилки', () => pm.expect(pm.response.json().error.code).to.eql('not_found'));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Товари",
+      "item": [
+        {
+          "name": "Успішні запити",
+          "item": [
+            {
+              "name": "Список товарів",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/products",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products"
+                  ]
+                },
+                "description": "Каталог товарів. 200."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Пошук і сортування",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/products?search=Husky&category_id=1&sort_by=-price_per_day",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "Husky"
+                    },
+                    {
+                      "key": "category_id",
+                      "value": "1"
+                    },
+                    {
+                      "key": "sort_by",
+                      "value": "-price_per_day"
+                    }
+                  ]
+                },
+                "description": "Параметри: search, category_id, brand_id, is_available, sort_by."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Створити товар",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/products",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products"
+                  ]
+                },
+                "description": "Створює товар. 201.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Рюкзак Osprey Talon 22\",\n  \"description\": \"Об'єм 22 л\",\n  \"price_per_day\": 150.0,\n  \"category_id\": 2,\n  \"brand_id\": 2,\n  \"is_available\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [
+                {
+                  "name": "201 Created",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/products",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "products"
+                      ]
+                    },
+                    "description": "Створює товар. 201.",
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"name\": \"Рюкзак Osprey Talon 22\",\n  \"description\": \"Об'єм 22 л\",\n  \"price_per_day\": 150.0,\n  \"category_id\": 2,\n  \"brand_id\": 2,\n  \"is_available\": true\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"id\": 7,\n  \"name\": \"Рюкзак Osprey Talon 22\",\n  \"description\": \"Об'єм 22 л\",\n  \"price_per_day\": 150.0,\n  \"is_available\": true,\n  \"category_id\": 2,\n  \"category_name\": \"Рюкзаки\",\n  \"brand_id\": 2,\n  \"brand_name\": \"Osprey\"\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "pm.collectionVariables.set('product_id', json.id);",
+                      "pm.test('201 Created', () => pm.response.to.have.status(201));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Товар за id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/products/{{product_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products",
+                    "{{product_id}}"
+                  ]
+                },
+                "description": "Деталі товару. 200."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Оновити товар (PUT)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/products/{{product_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products",
+                    "{{product_id}}"
+                  ]
+                },
+                "description": "Повне оновлення (усі обов'язкові поля). 200.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Рюкзак Osprey Talon 22 Pro\",\n  \"description\": \"Об'єм 22 л\",\n  \"price_per_day\": 170.0,\n  \"category_id\": 2,\n  \"brand_id\": 2,\n  \"is_available\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Змінити доступність (PATCH)",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/products/{{product_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products",
+                    "{{product_id}}"
+                  ]
+                },
+                "description": "Часткове оновлення. 200.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"is_available\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Видалити товар",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/products/{{product_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products",
+                    "{{product_id}}"
+                  ]
+                },
+                "description": "204."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 204', () => pm.response.to.have.status(204));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Помилки",
+          "item": [
+            {
+              "name": "ПОМИЛКА 400: від'ємна ціна",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/products",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products"
+                  ]
+                },
+                "description": "Валідація ціни.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Рюкзак Osprey Talon 22\",\n  \"description\": \"Об'єм 22 л\",\n  \"price_per_day\": -10,\n  \"category_id\": 2,\n  \"brand_id\": 2,\n  \"is_available\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [
+                {
+                  "name": "400 Bad Request",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/products",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "products"
+                      ]
+                    },
+                    "description": "Валідація ціни.",
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"name\": \"Рюкзак Osprey Talon 22\",\n  \"description\": \"Об'єм 22 л\",\n  \"price_per_day\": -10,\n  \"category_id\": 2,\n  \"brand_id\": 2,\n  \"is_available\": true\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "status": "Bad Request",
+                  "code": 400,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"error\": {\n    \"code\": \"bad_request\",\n    \"message\": \"Передані дані некоректні. Перевірте поля в details та виправте помилки.\",\n    \"details\": {\n      \"price_per_day\": [\n        \"Ціна за добу має бути більшою за 0.\"\n      ]\n    }\n  }\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                      "pm.test('Єдиний формат помилки', () => pm.expect(pm.response.json().error.code).to.eql('bad_request'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "ПОМИЛКА 400: неіснуюча категорія",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/products",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products"
+                  ]
+                },
+                "description": "category_id вказує на неіснуючу категорію.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Рюкзак Osprey Talon 22\",\n  \"description\": \"Об'єм 22 л\",\n  \"price_per_day\": 150.0,\n  \"category_id\": 9999,\n  \"brand_id\": 2,\n  \"is_available\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [
+                {
+                  "name": "400 Bad Request",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/products",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "products"
+                      ]
+                    },
+                    "description": "category_id вказує на неіснуючу категорію.",
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"name\": \"Рюкзак Osprey Talon 22\",\n  \"description\": \"Об'єм 22 л\",\n  \"price_per_day\": 150.0,\n  \"category_id\": 9999,\n  \"brand_id\": 2,\n  \"is_available\": true\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "status": "Bad Request",
+                  "code": 400,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"error\": {\n    \"code\": \"bad_request\",\n    \"message\": \"Передані дані некоректні. Перевірте поля в details та виправте помилки.\",\n    \"details\": {\n      \"category_id\": [\n        \"Категорію з id=9999 не знайдено.\"\n      ]\n    }\n  }\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                      "pm.test('Єдиний формат помилки', () => pm.expect(pm.response.json().error.code).to.eql('bad_request'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "ПОМИЛКА 400: пропущені поля",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/products",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products"
+                  ]
+                },
+                "description": "Не передано обов'язкові поля.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Тільки назва\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                      "pm.test('Єдиний формат помилки', () => pm.expect(pm.response.json().error.code).to.eql('bad_request'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "ПОМИЛКА 400: невалідний параметр sort_by",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/products?sort_by=color",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products"
+                  ],
+                  "query": [
+                    {
+                      "key": "sort_by",
+                      "value": "color"
+                    }
+                  ]
+                },
+                "description": "Недопустиме значення sort_by."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                      "pm.test('Єдиний формат помилки', () => pm.expect(pm.response.json().error.code).to.eql('bad_request'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "ПОМИЛКА 404: товару не існує",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/products/9999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products",
+                    "9999"
+                  ]
+                },
+                "description": "Неіснуючий id."
+              },
+              "response": [
+                {
+                  "name": "404 Not Found",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base_url}}/products/9999",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "products",
+                        "9999"
+                      ]
+                    },
+                    "description": "Неіснуючий id."
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"error\": {\n    \"code\": \"not_found\",\n    \"message\": \"Товар з id=9999 не знайдено.\"\n  }\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Єдиний формат помилки', () => pm.expect(pm.response.json().error.code).to.eql('not_found'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "ПОМИЛКА 405: DELETE на колекції",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/products",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products"
+                  ]
+                },
+                "description": "Метод не підтримується."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 405', () => pm.response.to.have.status(405));",
+                      "pm.test('Єдиний формат помилки', () => pm.expect(pm.response.json().error.code).to.eql('method_not_allowed'));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "ПОМИЛКА 404: невідомий ендпоінт",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/unknown",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "unknown"
+                  ]
+                },
+                "description": "JSON 404 у єдиному форматі."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                      "pm.test('Єдиний формат помилки', () => pm.expect(pm.response.json().error.code).to.eql('not_found'));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
