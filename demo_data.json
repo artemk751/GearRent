@@ -1,0 +1,138 @@
+[
+  {
+    "model": "rent.category",
+    "pk": 1,
+    "fields": {
+      "name": "Намети",
+      "description": "Намети для походів і кемпінгу"
+    }
+  },
+  {
+    "model": "rent.category",
+    "pk": 2,
+    "fields": {
+      "name": "Рюкзаки",
+      "description": "Туристичні та міські рюкзаки"
+    }
+  },
+  {
+    "model": "rent.category",
+    "pk": 3,
+    "fields": {
+      "name": "Спальні мішки",
+      "description": "Спальні мішки та килимки"
+    }
+  },
+  {
+    "model": "rent.category",
+    "pk": 4,
+    "fields": {
+      "name": "Фото та відеозйомка",
+      "description": "Камери, штативи та стабілізатори"
+    }
+  },
+  {
+    "model": "rent.brand",
+    "pk": 1,
+    "fields": {
+      "name": "Husky",
+      "description": "Чеський виробник туристичного спорядження"
+    }
+  },
+  {
+    "model": "rent.brand",
+    "pk": 2,
+    "fields": {
+      "name": "Osprey",
+      "description": "Рюкзаки для походів і подорожей"
+    }
+  },
+  {
+    "model": "rent.brand",
+    "pk": 3,
+    "fields": {
+      "name": "Deuter",
+      "description": "Німецький бренд рюкзаків і спальних мішків"
+    }
+  },
+  {
+    "model": "rent.brand",
+    "pk": 4,
+    "fields": {
+      "name": "DJI",
+      "description": "Стабілізатори та камери для зйомки"
+    }
+  },
+  {
+    "model": "rent.product",
+    "pk": 1,
+    "fields": {
+      "category": 1,
+      "brand": 1,
+      "name": "Намет Husky Bret 2",
+      "description": "2-місний, 3 сезони, 2,3 кг",
+      "price_per_day": "250.00",
+      "is_available": true
+    }
+  },
+  {
+    "model": "rent.product",
+    "pk": 2,
+    "fields": {
+      "category": 1,
+      "brand": 1,
+      "name": "Намет Husky Bret 3",
+      "description": "3-місний, 3 сезони, 3,1 кг",
+      "price_per_day": "320.00",
+      "is_available": true
+    }
+  },
+  {
+    "model": "rent.product",
+    "pk": 3,
+    "fields": {
+      "category": 2,
+      "brand": 2,
+      "name": "Рюкзак Osprey Atmos 65",
+      "description": "Об'єм 65 л, вентильована спинка",
+      "price_per_day": "180.00",
+      "is_available": true
+    }
+  },
+  {
+    "model": "rent.product",
+    "pk": 4,
+    "fields": {
+      "category": 2,
+      "brand": 3,
+      "name": "Рюкзак Deuter Futura 32",
+      "description": "Об'єм 32 л, для денних походів",
+      "price_per_day": "120.00",
+      "is_available": false
+    }
+  },
+  {
+    "model": "rent.product",
+    "pk": 5,
+    "fields": {
+      "category": 3,
+      "brand": 3,
+      "name": "Спальний мішок Deuter Orbit",
+      "description": "Комфорт до +5 °C",
+      "price_per_day": "90.00",
+      "is_available": true
+    }
+  },
+  {
+    "model": "rent.product",
+    "pk": 6,
+    "fields": {
+      "category": 4,
+      "brand": 4,
+      "name": "Стабілізатор DJI RS 3",
+      "description": "Триосьовий стабілізатор для дзеркальних камер",
+      "price_per_day": "600.00",
+      "is_available": true
+    }
+  }
+]
