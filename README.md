@@ -52,3 +52,18 @@
   * **Status:** `200 OK` | **Res:** `[{"order_id": 101, "total_price": 750.0, "items": [{"product_id": 1, "rental_days": 3}]}]`
 
   ![alt text](image.png)
+
+## Як запустити проєкт
+
+Адреси й порти:
+
+
+1. Запустіть бекенд:
+
+   ```bash
+   python manage.py migrate
+   python manage.py loaddata demo_data
+   python manage.py runserver
+   ```
+2. Відкрийте в браузері `http://127.0.0.1:8000/api/v1`.
+

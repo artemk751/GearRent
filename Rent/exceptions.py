@@ -25,7 +25,6 @@ VALIDATION_MESSAGE = (
 
 
 class ConflictError(exceptions.APIException):
-
     status_code = status.HTTP_409_CONFLICT
     default_detail = "Операція суперечить поточному стану даних."
     default_code = "conflict"
@@ -55,8 +54,7 @@ def api_exception_handler(exc, context):
     if isinstance(exc, ProtectedError):
         return build_error(
             409,
-            "Неможливо видалити об'єкт, оскільки на нього "
-            "посилаються інші записи.",
+            "Неможливо видалити об'єкт, оскільки на нього посилаються інші записи.",
         )
     if isinstance(exc, IntegrityError):
         return build_error(
@@ -65,20 +63,14 @@ def api_exception_handler(exc, context):
             "(наприклад, значення має бути унікальним).",
         )
     if isinstance(exc, exceptions.ValidationError):
-        return build_error(
-            400, VALIDATION_MESSAGE, _normalize_details(exc.detail)
-        )
+        return build_error(400, VALIDATION_MESSAGE, _normalize_details(exc.detail))
     if isinstance(exc, exceptions.ParseError):
         return build_error(400, "Тіло запиту не є коректним JSON.")
     if isinstance(exc, exceptions.MethodNotAllowed):
         method = context["request"].method
-        return build_error(
-            405, f"Метод {method} не підтримується для цього ендпоінта."
-        )
+        return build_error(405, f"Метод {method} не підтримується для цього ендпоінта.")
     if isinstance(exc, exceptions.UnsupportedMediaType):
-        return build_error(
-            415, "Підтримується лише Content-Type: application/json."
-        )
+        return build_error(415, "Підтримується лише Content-Type: application/json.")
     if isinstance(exc, exceptions.APIException):
         return build_error(exc.status_code, str(exc.detail))
 

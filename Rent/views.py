@@ -32,7 +32,6 @@ def get_or_404(queryset, pk, label):
 
 
 class ListCreateView(APIView):
-
     model = None
     serializer_class = None
 
@@ -51,7 +50,6 @@ class ListCreateView(APIView):
 
 
 class DetailView(APIView):
-
     model = None
     serializer_class = None
     label = ""
@@ -71,9 +69,7 @@ class DetailView(APIView):
 
     def update(self, request, pk, partial):
         instance = self.get_instance(pk)
-        serializer = self.serializer_class(
-            instance, data=request.data, partial=partial
-        )
+        serializer = self.serializer_class(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
@@ -108,9 +104,7 @@ def parse_int_param(params, name):
     try:
         return int(raw)
     except ValueError:
-        raise ValidationError(
-            {name: ["Значення має бути цілим числом."]}
-        ) from None
+        raise ValidationError({name: ["Значення має бути цілим числом."]}) from None
 
 
 def parse_bool_param(params, name):
@@ -155,9 +149,7 @@ class ProductListView(ListCreateView):
         if sort_by:
             if sort_by not in SORT_FIELDS:
                 allowed = ", ".join(SORT_FIELDS)
-                raise ValidationError(
-                    {"sort_by": [f"Допустимі значення: {allowed}."]}
-                )
+                raise ValidationError({"sort_by": [f"Допустимі значення: {allowed}."]})
             queryset = queryset.order_by(sort_by, "id")
         return queryset
 
@@ -221,6 +213,7 @@ class BrandDetailView(DetailView):
 class BrandProductsView(RelatedProductsView):
     parent_model = Brand
     label = "Бренд"
+
 
 class ApiNotFoundView(APIView):
     def initial(self, request, *args, **kwargs):

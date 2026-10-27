@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="products",
-                        to="catalog.brand",
+                        to="rent.brand",
                     ),
                 ),
                 (
@@ -74,7 +74,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="products",
-                        to="catalog.category",
+                        to="rent.category",
                     ),
                 ),
             ],
