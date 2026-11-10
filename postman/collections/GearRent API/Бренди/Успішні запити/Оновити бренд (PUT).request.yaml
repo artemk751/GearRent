@@ -1,0 +1,19 @@
+$kind: http-request
+description: Повне оновлення. 200.
+url: "{{base_url}}/brands/{{brand_id}}"
+method: PUT
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{access}}
+body:
+  type: json
+  content: |-
+    {
+      "name": "Salewa Italia",
+      "description": "Оновлений опис"
+    }
+scripts:
+  - type: afterResponse
+    code: pm.test('Status 200', () => pm.response.to.have.status(200));
+    language: text/javascript
+order: 5000

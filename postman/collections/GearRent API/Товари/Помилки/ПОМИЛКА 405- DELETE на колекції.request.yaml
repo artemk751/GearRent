@@ -1,0 +1,14 @@
+$kind: http-request
+name: "ПОМИЛКА 405: DELETE на колекції"
+description: Метод не підтримується.
+url: "{{base_url}}/products"
+method: DELETE
+headers:
+  Authorization: Bearer {{access}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status 405', () => pm.response.to.have.status(405));
+      pm.test('Єдиний формат помилки', () => pm.expect(pm.response.json().error.code).to.eql('method_not_allowed'));
+    language: text/javascript
+order: 6000

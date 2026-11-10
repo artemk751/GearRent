@@ -1,0 +1,14 @@
+$kind: http-request
+name: "Refresh: недійсний токен"
+description: "401."
+url: "{{base_url}}/auth/refresh"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "refresh": "broken"
+    }
+order: 4000

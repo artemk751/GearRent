@@ -1,0 +1,27 @@
+$kind: http-request
+description: Створює товар. 201.
+url: "{{base_url}}/products"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{access}}
+body:
+  type: json
+  content: |-
+    {
+      "name": "Рюкзак Osprey Talon 22",
+      "description": "Об'єм 22 л",
+      "price_per_day": 150.0,
+      "category_id": 2,
+      "brand_id": 2,
+      "is_available": true
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      const json = pm.response.json();
+      pm.collectionVariables.set('product_id', json.id);
+      pm.test('201 Created', () => pm.response.to.have.status(201));
+    language: text/javascript
+examples: ./.resources/Створити товар.resources/examples
+order: 3000

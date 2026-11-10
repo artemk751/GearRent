@@ -1,0 +1,38 @@
+$kind: http-example
+request:
+  url: "{{base_url}}/products"
+  method: POST
+  headers:
+    Content-Type: application/json
+    Authorization: Bearer {{access}}
+  body:
+    type: json
+    content: |-
+      {
+        "name": "Рюкзак Osprey Talon 22",
+        "description": "Об'єм 22 л",
+        "price_per_day": 150.0,
+        "category_id": 9999,
+        "brand_id": 2,
+        "is_available": true
+      }
+response:
+  statusCode: 400
+  statusText: Bad Request
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "error": {
+          "code": "bad_request",
+          "message": "Передані дані некоректні. Перевірте поля в details та виправте помилки.",
+          "details": {
+            "category_id": [
+              "Категорію з id=9999 не знайдено."
+            ]
+          }
+        }
+      }
+order: 1000

@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "GearRent API",
-    "description": "CRUD для товарів, категорій і брендів. Запускайте папки по порядку: змінні category_id, brand_id, product_id зберігаються автоматично.",
+    "description": "CRUD для товарів, категорій і брендів. Запускайте папки по порядку: змінні category_id, brand_id, product_id зберігаються автоматично. Для захищених запитів спочатку виконайте «Авторизація → Успішні запити → Логін».",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -20,9 +20,413 @@
     {
       "key": "product_id",
       "value": ""
+    },
+    {
+      "key": "access",
+      "value": ""
+    },
+    {
+      "key": "refresh",
+      "value": ""
     }
   ],
   "item": [
+    {
+      "name": "Авторизація",
+      "description": "Спочатку Реєстрація, потім Логін: токени зберігаються у змінні access і refresh та підставляються в захищені запити.",
+      "item": [
+        {
+          "name": "Успішні запити",
+          "item": [
+            {
+              "name": "Реєстрація",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/auth/register",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "register"
+                  ]
+                },
+                "description": "Створює користувача. 201.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"artem\",\n  \"first_name\": \"Артем\",\n  \"last_name\": \"К\",\n  \"email\": \"artem@example.com\",\n  \"password\": \"Str0ng!Pass-2026\",\n  \"password_confirm\": \"Str0ng!Pass-2026\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Логін",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                },
+                "description": "Повертає access, refresh і user. 200. Токени зберігаються автоматично.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"artem\",\n  \"password\": \"Str0ng!Pass-2026\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const d = pm.response.json();",
+                      "if (d.access) {",
+                      "  pm.collectionVariables.set('access', d.access);",
+                      "  pm.collectionVariables.set('refresh', d.refresh);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Оновити access (refresh)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/auth/refresh",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "refresh"
+                  ]
+                },
+                "description": "Новий access (і новий refresh). 200.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refresh\": \"{{refresh}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const d = pm.response.json();",
+                      "if (d.access) { pm.collectionVariables.set('access', d.access); }",
+                      "if (d.refresh) { pm.collectionVariables.set('refresh', d.refresh); }"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Мій профіль",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/users/me",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "me"
+                  ]
+                },
+                "description": "Потрібен токен. 200."
+              },
+              "response": []
+            },
+            {
+              "name": "Список користувачів (admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/users",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users"
+                  ]
+                },
+                "description": "Лише адміністратор (потрібно увійти під createsuperuser). 200."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Помилки",
+          "item": [
+            {
+              "name": "Реєстрація: невалідні дані",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/auth/register",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "register"
+                  ]
+                },
+                "description": "400 з details по кожному полю.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"\",\n  \"email\": \"bad\",\n  \"password\": \"123\",\n  \"password_confirm\": \"456\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Реєстрація: паролі не збігаються",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/auth/register",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "register"
+                  ]
+                },
+                "description": "400, поле password_confirm.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"artem2\",\n  \"first_name\": \"Артем\",\n  \"last_name\": \"К\",\n  \"email\": \"artem2@example.com\",\n  \"password\": \"Str0ng!Pass-2026\",\n  \"password_confirm\": \"Other!Pass-2026\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Логін: невірний пароль",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                },
+                "description": "401.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"artem\",\n  \"password\": \"wrong\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Refresh: недійсний токен",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/auth/refresh",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "refresh"
+                  ]
+                },
+                "description": "401.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refresh\": \"broken\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Мій профіль без токена",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/users/me",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "me"
+                  ]
+                },
+                "description": "401."
+              },
+              "response": []
+            },
+            {
+              "name": "Створити категорію без токена",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/categories",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "categories"
+                  ]
+                },
+                "description": "401.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Без токена\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Список користувачів: не адмін",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/users",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users"
+                  ]
+                },
+                "description": "403, якщо увійшли звичайним користувачем."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
     {
       "name": "Категорії",
       "item": [
@@ -37,6 +441,10 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
                   }
                 ],
                 "url": {
@@ -68,6 +476,10 @@
                       {
                         "key": "Content-Type",
                         "value": "application/json"
+                      },
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{access}}"
                       }
                     ],
                     "url": {
@@ -214,6 +626,10 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
                   }
                 ],
                 "url": {
@@ -258,6 +674,10 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
                   }
                 ],
                 "url": {
@@ -307,6 +727,10 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
                   }
                 ],
                 "url": {
@@ -338,6 +762,10 @@
                       {
                         "key": "Content-Type",
                         "value": "application/json"
+                      },
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{access}}"
                       }
                     ],
                     "url": {
@@ -393,6 +821,10 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
                   }
                 ],
                 "url": {
@@ -424,6 +856,10 @@
                       {
                         "key": "Content-Type",
                         "value": "application/json"
+                      },
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{access}}"
                       }
                     ],
                     "url": {
@@ -535,7 +971,12 @@
               "name": "ПОМИЛКА 409: видалити категорію з товарами",
               "request": {
                 "method": "DELETE",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
+                  }
+                ],
                 "url": {
                   "raw": "{{base_url}}/categories/1",
                   "host": [
@@ -553,7 +994,12 @@
                   "name": "409 Conflict",
                   "originalRequest": {
                     "method": "DELETE",
-                    "header": [],
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{access}}"
+                      }
+                    ],
                     "url": {
                       "raw": "{{base_url}}/categories/1",
                       "host": [
@@ -595,7 +1041,12 @@
               "name": "Видалити порожню категорію",
               "request": {
                 "method": "DELETE",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
+                  }
+                ],
                 "url": {
                   "raw": "{{base_url}}/categories/{{category_id}}",
                   "host": [
@@ -639,6 +1090,10 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
                   }
                 ],
                 "url": {
@@ -774,6 +1229,10 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
                   }
                 ],
                 "url": {
@@ -814,7 +1273,12 @@
               "name": "Видалити бренд без товарів",
               "request": {
                 "method": "DELETE",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
+                  }
+                ],
                 "url": {
                   "raw": "{{base_url}}/brands/{{brand_id}}",
                   "host": [
@@ -849,7 +1313,12 @@
               "name": "ПОМИЛКА 409: видалити бренд з товарами",
               "request": {
                 "method": "DELETE",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
+                  }
+                ],
                 "url": {
                   "raw": "{{base_url}}/brands/1",
                   "host": [
@@ -867,7 +1336,12 @@
                   "name": "409 Conflict",
                   "originalRequest": {
                     "method": "DELETE",
-                    "header": [],
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{access}}"
+                      }
+                    ],
                     "url": {
                       "raw": "{{base_url}}/brands/1",
                       "host": [
@@ -1026,6 +1500,10 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
                   }
                 ],
                 "url": {
@@ -1057,6 +1535,10 @@
                       {
                         "key": "Content-Type",
                         "value": "application/json"
+                      },
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{access}}"
                       }
                     ],
                     "url": {
@@ -1143,6 +1625,10 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
                   }
                 ],
                 "url": {
@@ -1187,6 +1673,10 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
                   }
                 ],
                 "url": {
@@ -1227,7 +1717,12 @@
               "name": "Видалити товар",
               "request": {
                 "method": "DELETE",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
+                  }
+                ],
                 "url": {
                   "raw": "{{base_url}}/products/{{product_id}}",
                   "host": [
@@ -1266,6 +1761,10 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
                   }
                 ],
                 "url": {
@@ -1297,6 +1796,10 @@
                       {
                         "key": "Content-Type",
                         "value": "application/json"
+                      },
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{access}}"
                       }
                     ],
                     "url": {
@@ -1352,6 +1855,10 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
                   }
                 ],
                 "url": {
@@ -1383,6 +1890,10 @@
                       {
                         "key": "Content-Type",
                         "value": "application/json"
+                      },
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{access}}"
                       }
                     ],
                     "url": {
@@ -1438,6 +1949,10 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
                   }
                 ],
                 "url": {
@@ -1574,7 +2089,12 @@
               "name": "ПОМИЛКА 405: DELETE на колекції",
               "request": {
                 "method": "DELETE",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access}}"
+                  }
+                ],
                 "url": {
                   "raw": "{{base_url}}/products",
                   "host": [

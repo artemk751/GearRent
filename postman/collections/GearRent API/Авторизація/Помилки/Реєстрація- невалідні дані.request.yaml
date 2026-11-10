@@ -1,0 +1,17 @@
+$kind: http-request
+name: "Реєстрація: невалідні дані"
+description: 400 з details по кожному полю.
+url: "{{base_url}}/auth/register"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "",
+      "email": "bad",
+      "password": "123",
+      "password_confirm": "456"
+    }
+order: 1000

@@ -1,0 +1,15 @@
+$kind: http-request
+name: "Логін: невірний пароль"
+description: "401."
+url: "{{base_url}}/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "artem",
+      "password": "wrong"
+    }
+order: 3000

@@ -1,0 +1,19 @@
+$kind: http-example
+request:
+  url: "{{base_url}}/products/9999"
+  method: GET
+response:
+  statusCode: 404
+  statusText: Not Found
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "error": {
+          "code": "not_found",
+          "message": "Товар з id=9999 не знайдено."
+        }
+      }
+order: 1000

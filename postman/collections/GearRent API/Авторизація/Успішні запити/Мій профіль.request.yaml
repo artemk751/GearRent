@@ -1,0 +1,7 @@
+$kind: http-request
+description: Потрібен токен. 200.
+url: "{{base_url}}/users/me"
+method: GET
+headers:
+  Authorization: Bearer {{access}}
+order: 4000

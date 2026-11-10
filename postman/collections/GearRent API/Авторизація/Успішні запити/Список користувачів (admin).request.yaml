@@ -1,0 +1,7 @@
+$kind: http-request
+description: Лише адміністратор (потрібно увійти під createsuperuser). 200.
+url: "{{base_url}}/users"
+method: GET
+headers:
+  Authorization: Bearer {{access}}
+order: 5000
