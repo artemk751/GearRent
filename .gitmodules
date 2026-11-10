@@ -1,0 +1,3 @@
+[submodule "GearRent-Front"]
+	path = GearRent-Front
+	url = https://github.com/artemk751/GearRent-Front.git
