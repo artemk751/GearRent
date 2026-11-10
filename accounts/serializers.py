@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 User = get_user_model()
@@ -16,17 +17,43 @@ PASSWORD_MAX = 128
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "username", "email", "first_name", "last_name", "is_staff")
+        fields = ["id", "username", "email", "first_name", "last_name", "is_staff"]
         read_only_fields = fields
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        max_length=USERNAME_MAX,
+        validators=[
+            User.username_validator,
+            UniqueValidator(
+                queryset=User.objects.all(),
+                lookup="iexact",
+                message="Користувач з таким іменем уже існує.",
+            ),
+        ],
+    )
+    first_name = serializers.CharField(
+        max_length=NAME_MAX, required=False, allow_blank=True, default=""
+    )
+    last_name = serializers.CharField(
+        max_length=NAME_MAX, required=False, allow_blank=True, default=""
+    )
+    email = serializers.EmailField(
+        max_length=EMAIL_MAX,
+        error_messages={
+            "invalid": "Введіть коректну email-адресу, наприклад name@example.com."
+        },
+    )
     password = serializers.CharField(
         write_only=True,
         min_length=PASSWORD_MIN,
         max_length=PASSWORD_MAX,
         trim_whitespace=False,
         style={"input_type": "password"},
+        error_messages={
+            "min_length": f"Пароль має містити щонайменше {PASSWORD_MIN} символів."
+        },
     )
     password_confirm = serializers.CharField(
         write_only=True,
@@ -37,33 +64,32 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = (
+        fields = [
             "username",
             "first_name",
             "last_name",
             "email",
             "password",
             "password_confirm",
-        )
-        extra_kwargs = {
-            "username": {"max_length": USERNAME_MAX},
-            "first_name": {"required": False, "allow_blank": True, "max_length": NAME_MAX},
-            "last_name": {"required": False, "allow_blank": True, "max_length": NAME_MAX},
-            "email": {"required": True, "allow_blank": False, "max_length": EMAIL_MAX},
-        }
+        ]
 
     def validate_email(self, value):
         value = value.strip().lower()
-        domain = value.rsplit("@", 1)[-1]
-        if "." not in domain:
-            raise serializers.ValidationError("Enter a valid email address, e.g. name@example.com.")
+        if "." not in value.rsplit("@", 1)[-1]:
+            raise serializers.ValidationError(
+                "Введіть коректну email-адресу, наприклад name@example.com."
+            )
         if User.objects.filter(email__iexact=value).exists():
-            raise serializers.ValidationError("A user with this email already exists.")
+            raise serializers.ValidationError(
+                "Користувач з такою email-адресою вже існує."
+            )
         return value
 
     def validate(self, attrs):
         if attrs["password"] != attrs["password_confirm"]:
-            raise serializers.ValidationError({"password_confirm": "Passwords do not match."})
+            raise serializers.ValidationError(
+                {"password_confirm": "Паролі не збігаються."}
+            )
         candidate = User(
             username=attrs.get("username", ""),
             email=attrs.get("email", ""),
@@ -73,7 +99,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         try:
             validate_password(attrs["password"], user=candidate)
         except DjangoValidationError as exc:
-            raise serializers.ValidationError({"password": list(exc.messages)})
+            raise serializers.ValidationError({"password": list(exc.messages)}) from exc
         return attrs
 
     def create(self, validated_data):
@@ -82,7 +108,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(TokenObtainPairSerializer):
-    default_error_messages = {"no_active_account": "Invalid username or password."}
+    default_error_messages = {
+        "no_active_account": "Невірне ім'я користувача або пароль."
+    }
+
     def validate(self, attrs):
         data = super().validate(attrs)
         data["user"] = UserSerializer(self.user).data

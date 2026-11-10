@@ -1,5 +1,3 @@
-from django.shortcuts import render
-
 from django.contrib.auth import get_user_model
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
@@ -12,14 +10,9 @@ User = get_user_model()
 
 
 class RegisterView(generics.CreateAPIView):
-
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
     authentication_classes = []
-
-    def get(self, request, *args, **kwargs):
-        serializer = self.get_serializer()
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -30,9 +23,6 @@ class RegisterView(generics.CreateAPIView):
 
 class LoginView(TokenObtainPairView):
     serializer_class = LoginSerializer
-    def get(self, request, *args, **kwargs):
-        serializer = self.get_serializer()
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class MeView(generics.RetrieveAPIView):
@@ -47,3 +37,4 @@ class UserListView(generics.ListAPIView):
     queryset = User.objects.order_by("id")
     serializer_class = UserSerializer
     permission_classes = [IsAdminUser]
+    pagination_class = None
