@@ -1,0 +1,38 @@
+$kind: http-example
+request:
+  url: "{{base_url}}/products"
+  method: POST
+  headers:
+    Content-Type: application/json
+    Authorization: Bearer {{access}}
+  body:
+    type: json
+    content: |-
+      {
+        "name": "Рюкзак Osprey Talon 22",
+        "description": "Об'єм 22 л",
+        "price_per_day": 150.0,
+        "category_id": 2,
+        "brand_id": 2,
+        "is_available": true
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "id": 7,
+        "name": "Рюкзак Osprey Talon 22",
+        "description": "Об'єм 22 л",
+        "price_per_day": 150.0,
+        "is_available": true,
+        "category_id": 2,
+        "category_name": "Рюкзаки",
+        "brand_id": 2,
+        "brand_name": "Osprey"
+      }
+order: 1000

@@ -1,0 +1,20 @@
+$kind: http-request
+description: Новий access (і новий refresh). 200.
+url: "{{base_url}}/auth/refresh"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "refresh": "{{refresh}}"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      const d = pm.response.json();
+      if (d.access) { pm.collectionVariables.set('access', d.access); }
+      if (d.refresh) { pm.collectionVariables.set('refresh', d.refresh); }
+    language: text/javascript
+order: 3000

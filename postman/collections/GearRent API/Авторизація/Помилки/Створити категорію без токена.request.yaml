@@ -1,0 +1,13 @@
+$kind: http-request
+description: "401."
+url: "{{base_url}}/categories"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Без токена"
+    }
+order: 6000

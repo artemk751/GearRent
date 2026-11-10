@@ -1,0 +1,19 @@
+$kind: http-request
+name: "Реєстрація: паролі не збігаються"
+description: 400, поле password_confirm.
+url: "{{base_url}}/auth/register"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "artem2",
+      "first_name": "Артем",
+      "last_name": "К",
+      "email": "artem2@example.com",
+      "password": "Str0ng!Pass-2026",
+      "password_confirm": "Other!Pass-2026"
+    }
+order: 2000

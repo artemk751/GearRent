@@ -1,0 +1,21 @@
+$kind: http-example
+request:
+  url: "{{base_url}}/categories/1"
+  method: DELETE
+  headers:
+    Authorization: Bearer {{access}}
+response:
+  statusCode: 409
+  statusText: Conflict
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "error": {
+          "code": "conflict",
+          "message": "Неможливо видалити категорію «Намети», оскільки за нею закріплено 2 товари. Спершу видаліть ці товари або перенесіть їх в іншу категорію."
+        }
+      }
+order: 1000

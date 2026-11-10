@@ -1,0 +1,33 @@
+$kind: http-example
+request:
+  url: "{{base_url}}/categories"
+  method: POST
+  headers:
+    Content-Type: application/json
+    Authorization: Bearer {{access}}
+  body:
+    type: json
+    content: |-
+      {
+        "name": ""
+      }
+response:
+  statusCode: 400
+  statusText: Bad Request
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "error": {
+          "code": "bad_request",
+          "message": "Передані дані некоректні. Перевірте поля в details та виправте помилки.",
+          "details": {
+            "name": [
+              "Це поле не може бути порожнім."
+            ]
+          }
+        }
+      }
+order: 1000

@@ -7,11 +7,14 @@ from django.http import Http404
 from rest_framework import exceptions, status
 from rest_framework.response import Response
 from rest_framework.views import set_rollback
+from rest_framework_simplejwt.exceptions import InvalidToken
 
 logger = logging.getLogger(__name__)
 
 ERROR_CODES = {
     status.HTTP_400_BAD_REQUEST: "bad_request",
+    status.HTTP_401_UNAUTHORIZED: "unauthorized",
+    status.HTTP_403_FORBIDDEN: "forbidden",
     status.HTTP_404_NOT_FOUND: "not_found",
     status.HTTP_405_METHOD_NOT_ALLOWED: "method_not_allowed",
     status.HTTP_409_CONFLICT: "conflict",
@@ -66,6 +69,18 @@ def api_exception_handler(exc, context):
         return build_error(400, VALIDATION_MESSAGE, _normalize_details(exc.detail))
     if isinstance(exc, exceptions.ParseError):
         return build_error(400, "Тіло запиту не є коректним JSON.")
+    if isinstance(exc, exceptions.NotAuthenticated):
+        return build_error(
+            401,
+            "Потрібна автентифікація. Передайте токен у заголовку "
+            "Authorization: Bearer <access_token>.",
+        )
+    if isinstance(exc, InvalidToken):
+        return build_error(401, "Токен недійсний або термін його дії закінчився.")
+    if isinstance(exc, exceptions.AuthenticationFailed):
+        return build_error(401, str(exc.detail))
+    if isinstance(exc, exceptions.PermissionDenied):
+        return build_error(403, "Недостатньо прав для виконання цієї дії.")
     if isinstance(exc, exceptions.MethodNotAllowed):
         method = context["request"].method
         return build_error(405, f"Метод {method} не підтримується для цього ендпоінта.")

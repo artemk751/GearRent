@@ -1,0 +1,9 @@
+$kind: collection
+description: "CRUD для товарів, категорій і брендів. Запускайте папки по порядку: змінні category_id, brand_id, product_id зберігаються автоматично. Для захищених запитів спочатку виконайте «Авторизація → Успішні запити → Логін»."
+variables:
+  base_url: http://127.0.0.1:8000/api/v1
+  category_id: ""
+  brand_id: ""
+  product_id: ""
+  access: ""
+  refresh: ""

@@ -1,0 +1,23 @@
+$kind: http-request
+description: Повне оновлення (усі обов'язкові поля). 200.
+url: "{{base_url}}/products/{{product_id}}"
+method: PUT
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{access}}
+body:
+  type: json
+  content: |-
+    {
+      "name": "Рюкзак Osprey Talon 22 Pro",
+      "description": "Об'єм 22 л",
+      "price_per_day": 170.0,
+      "category_id": 2,
+      "brand_id": 2,
+      "is_available": true
+    }
+scripts:
+  - type: afterResponse
+    code: pm.test('Status 200', () => pm.response.to.have.status(200));
+    language: text/javascript
+order: 5000

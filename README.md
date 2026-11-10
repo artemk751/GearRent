@@ -32,26 +32,62 @@
 
 
 ### Авторизація та Користувачі (`/auth`, `/users`)
+Використовується JWT (`djangorestframework-simplejwt`). Усі URL записуються без завершального «/».
+
+**Як передавати токен.** Захищені ендпоінти потребують заголовок:
+
+```
+Authorization: Bearer <access_token>
+```
+
+**Токени.** `access` живе 15 хвилин, `refresh` — 7 днів. Коли access закінчується, API повертає `401`. Клієнт надсилає refresh на `POST /auth/refresh`, отримує новий access (і новий refresh, бо ввімкнено ротацію) та повторює запит. Якщо refresh теж недійсний, користувач має увійти знову. **Logout** виконується на клієнті: збережені токени видаляються.
+
+| Метод | URL | Доступ |
+|---|---|---|
+| POST | `/auth/register` | усі |
+| POST | `/auth/login` | усі |
+| POST | `/auth/refresh` | усі (потрібен refresh-токен) |
+| GET | `/users/me` | авторизовані |
+| GET | `/users` | лише адміністратори |
+
 * `POST /auth/register` — Реєстрація.  
-  * **Req:** `{"email": "user@test.com", "password": "123", "full_name": "Іван", "phone": "+380970000000"}`  
-  * **Status:** `201 Created` | **Res:** `{"id": 1, "email": "user@test.com"}`
+  * **Заголовки:** `Content-Type: application/json`  
+  * **Req:** `{"username": "artem", "first_name": "Артем", "last_name": "К", "email": "artem@example.com", "password": "Str0ng!Pass-2026", "password_confirm": "Str0ng!Pass-2026"}`  
+  * `first_name` і `last_name` необов'язкові. Обмеження: `username`, `first_name`, `last_name` — до 30 символів, `email` — до 254, `password` — від 8 до 128 символів та перевірка складності (не надто схожий на дані користувача, не з поширених, не лише з цифр). `username` та `email` унікальні, `password_confirm` має збігатися з `password`.  
+  * **Status:** `201 Created` | **Res:** `{"id": 1, "username": "artem", "email": "artem@example.com", "first_name": "Артем", "last_name": "К", "is_staff": false}`  
+  * **Status:** `400 Bad Request` | **Res:** `{"error": {"code": "bad_request", "message": "Передані дані некоректні. ...", "details": {"email": ["Введіть коректну email-адресу, наприклад name@example.com."], "password_confirm": ["Паролі не збігаються."]}}}`  
+  * Пароль зберігається в базі лише у захешованому вигляді.
 * `POST /auth/login` — Вхід у систему.  
-  * **Req:** `{"email": "user@test.com", "password": "123"}`  
-  * **Status:** `200 OK` | **Res:** `{"token": "jwt_token", "user": {"id": 1, "email": "user@test.com"}}`
-* `GET /users/me` — Профіль користувача.  
-  * **Status:** `200 OK` | **Res:** `{"id": 1, "email": "user@test.com", "full_name": "Іван"}`
-* `PATCH /users/me` — Оновити профіль.  
-  * **Req:** `{"full_name": "Іван Петренко"}`  
-  * **Status:** `200 OK` | **Res:** `{"id": 1, "full_name": "Іван Петренко"}`
+  * **Req:** `{"username": "artem", "password": "Str0ng!Pass-2026"}`  
+  * **Status:** `200 OK` | **Res:** `{"access": "<access_token>", "refresh": "<refresh_token>", "user": {"id": 1, "username": "artem", "email": "artem@example.com", "first_name": "Артем", "last_name": "К", "is_staff": false}}`  
+  * **Status:** `401 Unauthorized` | **Res:** `{"error": {"code": "unauthorized", "message": "Невірне ім'я користувача або пароль."}}`
+* `POST /auth/refresh` — Оновлення access-токена.  
+  * **Req:** `{"refresh": "<refresh_token>"}`  
+  * **Status:** `200 OK` | **Res:** `{"access": "<new_access>", "refresh": "<new_refresh>"}`  
+  * **Status:** `401 Unauthorized` — refresh недійсний або прострочений.
+* `GET /users/me` — Профіль поточного користувача.  
+  * **Заголовки:** `Authorization: Bearer <access_token>`  
+  * **Status:** `200 OK` | **Res:** `{"id": 1, "username": "artem", "email": "artem@example.com", "first_name": "Артем", "last_name": "К", "is_staff": false}`  
+  * **Status:** `401 Unauthorized` — токена немає або він недійсний.
+* `GET /users` — Список користувачів (лише адміністратор).  
+  * **Заголовки:** `Authorization: Bearer <access_token>`  
+  * **Status:** `200 OK` | **Res:** масив користувачів, як у `/users/me`  
+  * **Status:** `401 Unauthorized` — немає токена; `403 Forbidden` — користувач не адміністратор.
 
-### Замовлення (`/orders`)
-* `POST /orders` — Оформити замовлення.  
-  * **Req:** `{"items": [{"product_id": 1, "rental_days": 3}]}`  
-  * **Status:** `201 Created` | **Res:** `{"order_id": 101, "status": "created", "total_price": 750.0}`
-* `GET /users/me/orders` — Історія замовлень.  
-  * **Status:** `200 OK` | **Res:** `[{"order_id": 101, "total_price": 750.0, "items": [{"product_id": 1, "rental_days": 3}]}]`
+### Права доступу
 
-  ![alt text](image.png)
+| Дія | Хто може |
+|---|---|
+| `GET` для товарів, категорій і брендів | усі |
+| `POST`, `PUT`, `PATCH` | авторизовані користувачі |
+| `DELETE` | адміністратори (`is_staff`) |
+
+Помилки доступу повертаються в загальному форматі:
+
+* `401 Unauthorized` — `{"error": {"code": "unauthorized", "message": "Потрібна автентифікація. Передайте токен у заголовку Authorization: Bearer <access_token>."}}` (або повідомлення про недійсний чи прострочений токен).
+* `403 Forbidden` — `{"error": {"code": "forbidden", "message": "Недостатньо прав для виконання цієї дії."}}`
+
+Адміністратора створюють командою `python manage.py createsuperuser`.
 
 ## Як запустити проєкт
 

@@ -1,0 +1,28 @@
+$kind: http-example
+request:
+  url: "{{base_url}}/categories"
+  method: POST
+  headers:
+    Content-Type: application/json
+    Authorization: Bearer {{access}}
+  body:
+    type: json
+    content: |-
+      {
+        "name": "Альпінізм",
+        "description": "Спорядження для сходжень"
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "id": 5,
+        "name": "Альпінізм",
+        "description": "Спорядження для сходжень"
+      }
+order: 1000

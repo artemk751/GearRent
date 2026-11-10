@@ -1,0 +1,14 @@
+$kind: http-request
+name: "ПОМИЛКА 400: невалідний параметр sort_by"
+description: Недопустиме значення sort_by.
+url: "{{base_url}}/products?sort_by=color"
+method: GET
+queryParams:
+  sort_by: color
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status 400', () => pm.response.to.have.status(400));
+      pm.test('Єдиний формат помилки', () => pm.expect(pm.response.json().error.code).to.eql('bad_request'));
+    language: text/javascript
+order: 4000

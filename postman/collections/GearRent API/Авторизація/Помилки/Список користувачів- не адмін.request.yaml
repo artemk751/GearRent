@@ -1,0 +1,8 @@
+$kind: http-request
+name: "Список користувачів: не адмін"
+description: 403, якщо увійшли звичайним користувачем.
+url: "{{base_url}}/users"
+method: GET
+headers:
+  Authorization: Bearer {{access}}
+order: 7000

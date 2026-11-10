@@ -1,0 +1,28 @@
+$kind: http-example
+request:
+  url: "{{base_url}}/categories"
+  method: POST
+  headers:
+    Content-Type: application/json
+    Authorization: Bearer {{access}}
+  body:
+    type: json
+    content: |-
+      {
+        "name": "намети"
+      }
+response:
+  statusCode: 409
+  statusText: Conflict
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "error": {
+          "code": "conflict",
+          "message": "Категорія з назвою «намети» вже існує. Оберіть іншу назву."
+        }
+      }
+order: 1000

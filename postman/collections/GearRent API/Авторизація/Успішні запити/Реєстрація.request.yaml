@@ -1,0 +1,18 @@
+$kind: http-request
+description: Створює користувача. 201.
+url: "{{base_url}}/auth/register"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "artem",
+      "first_name": "Артем",
+      "last_name": "К",
+      "email": "artem@example.com",
+      "password": "Str0ng!Pass-2026",
+      "password_confirm": "Str0ng!Pass-2026"
+    }
+order: 1000

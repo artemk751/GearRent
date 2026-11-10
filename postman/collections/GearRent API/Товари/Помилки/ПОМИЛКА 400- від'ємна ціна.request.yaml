@@ -1,0 +1,27 @@
+$kind: http-request
+name: "ПОМИЛКА 400: від'ємна ціна"
+description: Валідація ціни.
+url: "{{base_url}}/products"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{access}}
+body:
+  type: json
+  content: |-
+    {
+      "name": "Рюкзак Osprey Talon 22",
+      "description": "Об'єм 22 л",
+      "price_per_day": -10,
+      "category_id": 2,
+      "brand_id": 2,
+      "is_available": true
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status 400', () => pm.response.to.have.status(400));
+      pm.test('Єдиний формат помилки', () => pm.expect(pm.response.json().error.code).to.eql('bad_request'));
+    language: text/javascript
+examples: ./.resources/ПОМИЛКА 400- від'ємна ціна.resources/examples
+order: 1000

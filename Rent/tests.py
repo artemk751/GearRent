@@ -1,13 +1,22 @@
 from decimal import Decimal
 
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
 from .models import Brand, Category, Product
 
+User = get_user_model()
+
 
 class ApiTestCase(APITestCase):
     def setUp(self):
+        # Записи (POST/PUT/PATCH/DELETE) потребують авторизації, тому за замовчуванням
+        # тести виконуються від імені адміністратора
+        self.admin = User.objects.create_superuser(
+            "admin", "admin@example.com", "Adm1n!Pass-2026"
+        )
+        self.client.force_authenticate(self.admin)
         self.category = Category.objects.create(name="Намети")
         self.brand = Brand.objects.create(name="Husky")
         self.product = Product.objects.create(
@@ -305,3 +314,60 @@ class ProductFilterTests(ApiTestCase):
         ):
             response = self.client.get(reverse("product-list"), params)
             self.assert_error(response, 400, "bad_request")
+
+
+class PermissionTests(ApiTestCase):
+    def setUp(self):
+        super().setUp()
+        self.client.force_authenticate(None)
+        self.user = User.objects.create_user(
+            "user", "user@example.com", "Us3r!Pass-2026"
+        )
+
+    def test_public_endpoints_are_open(self):
+        for name in ("product-list", "category-list", "brand-list"):
+            self.assertEqual(self.client.get(reverse(name)).status_code, 200)
+        url = reverse("product-detail", args=[self.product.id])
+        self.assertEqual(self.client.get(url).status_code, 200)
+
+    def test_anonymous_cannot_write(self):
+        detail = reverse("product-detail", args=[self.product.id])
+        responses = [
+            self.client.post(
+                reverse("product-list"), self.product_payload(), format="json"
+            ),
+            self.client.put(detail, self.product_payload(), format="json"),
+            self.client.patch(detail, {"is_available": False}, format="json"),
+            self.client.delete(detail),
+        ]
+        for response in responses:
+            self.assert_error(response, 401, "unauthorized")
+        self.assertEqual(Product.objects.count(), 1)
+
+    def test_user_can_create_and_update_but_not_delete(self):
+        self.client.force_authenticate(self.user)
+        created = self.client.post(
+            reverse("product-list"), self.product_payload(), format="json"
+        )
+        self.assertEqual(created.status_code, 201)
+
+        detail = reverse("product-detail", args=[self.product.id])
+        updated = self.client.patch(detail, {"is_available": False}, format="json")
+        self.assertEqual(updated.status_code, 200)
+
+        self.assert_error(self.client.delete(detail), 403, "forbidden")
+        self.assertTrue(Product.objects.filter(pk=self.product.id).exists())
+
+    def test_admin_can_delete(self):
+        self.client.force_authenticate(self.admin)
+        detail = reverse("product-detail", args=[self.product.id])
+        self.assertEqual(self.client.delete(detail).status_code, 204)
+
+    def test_invalid_token_on_protected_endpoint_is_401(self):
+        response = self.client.post(
+            reverse("category-list"),
+            {"name": "Альпінізм"},
+            format="json",
+            HTTP_AUTHORIZATION="Bearer broken",
+        )
+        self.assert_error(response, 401, "unauthorized")

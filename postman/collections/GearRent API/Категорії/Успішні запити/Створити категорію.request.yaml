@@ -1,0 +1,23 @@
+$kind: http-request
+description: Створює категорію. 201.
+url: "{{base_url}}/categories"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{access}}
+body:
+  type: json
+  content: |-
+    {
+      "name": "Альпінізм",
+      "description": "Спорядження для сходжень"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      const json = pm.response.json();
+      pm.collectionVariables.set('category_id', json.id);
+      pm.test('201 Created', () => pm.response.to.have.status(201));
+    language: text/javascript
+examples: ./.resources/Створити категорію.resources/examples
+order: 1000

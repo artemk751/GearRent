@@ -1,0 +1,13 @@
+$kind: http-request
+description: "Параметри: search, category_id, brand_id, is_available, sort_by."
+url: "{{base_url}}/products?search=Husky&category_id=1&sort_by=-price_per_day"
+method: GET
+queryParams:
+  search: Husky
+  category_id: "1"
+  sort_by: -price_per_day
+scripts:
+  - type: afterResponse
+    code: pm.test('Status 200', () => pm.response.to.have.status(200));
+    language: text/javascript
+order: 2000

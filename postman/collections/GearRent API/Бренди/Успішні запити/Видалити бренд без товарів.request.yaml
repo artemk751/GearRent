@@ -1,0 +1,11 @@
+$kind: http-request
+description: "204."
+url: "{{base_url}}/brands/{{brand_id}}"
+method: DELETE
+headers:
+  Authorization: Bearer {{access}}
+scripts:
+  - type: afterResponse
+    code: pm.test('Status 204', () => pm.response.to.have.status(204));
+    language: text/javascript
+order: 6000

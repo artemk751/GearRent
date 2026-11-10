@@ -1,0 +1,23 @@
+$kind: http-request
+description: Повертає access, refresh і user. 200. Токени зберігаються автоматично.
+url: "{{base_url}}/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "artem",
+      "password": "Str0ng!Pass-2026"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      const d = pm.response.json();
+      if (d.access) {
+        pm.collectionVariables.set('access', d.access);
+        pm.collectionVariables.set('refresh', d.refresh);
+      }
+    language: text/javascript
+order: 2000
