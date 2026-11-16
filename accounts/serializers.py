@@ -90,6 +90,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"password_confirm": "Паролі не збігаються."}
             )
+
+        # Складність пароля перевіряється валідаторами з AUTH_PASSWORD_VALIDATORS
         candidate = User(
             username=attrs.get("username", ""),
             email=attrs.get("email", ""),
@@ -104,6 +106,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop("password_confirm")
+        # create_user зберігає пароль лише у захешованому вигляді
         return User.objects.create_user(**validated_data)
 
 
@@ -116,3 +119,14 @@ class LoginSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
         data["user"] = UserSerializer(self.user).data
         return data
+
+
+class LoginResponseSerializer(serializers.Serializer):
+    access = serializers.CharField(help_text="Access-токен (короткий термін життя).")
+    refresh = serializers.CharField(help_text="Refresh-токен для оновлення access.")
+    user = UserSerializer()
+
+
+class RefreshResponseSerializer(serializers.Serializer):
+    access = serializers.CharField(help_text="Новий access-токен.")
+    refresh = serializers.CharField(help_text="Новий refresh-токен (ротація).")

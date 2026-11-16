@@ -22,6 +22,18 @@ ERROR_CODES = {
     status.HTTP_500_INTERNAL_SERVER_ERROR: "server_error",
 }
 
+# Рівні логування для відповідей з помилкою: проблеми безпеки та конфлікти даних —
+# WARNING, звичайні помилки клієнта (валідація, 404, 405) — INFO
+LOG_LEVELS = {
+    status.HTTP_400_BAD_REQUEST: logging.INFO,
+    status.HTTP_401_UNAUTHORIZED: logging.WARNING,
+    status.HTTP_403_FORBIDDEN: logging.WARNING,
+    status.HTTP_404_NOT_FOUND: logging.INFO,
+    status.HTTP_405_METHOD_NOT_ALLOWED: logging.INFO,
+    status.HTTP_409_CONFLICT: logging.WARNING,
+    status.HTTP_415_UNSUPPORTED_MEDIA_TYPE: logging.INFO,
+}
+
 VALIDATION_MESSAGE = (
     "Передані дані некоректні. Перевірте поля в details та виправте помилки."
 )
@@ -49,7 +61,38 @@ def _normalize_details(detail):
     return {"non_field_errors": detail}
 
 
+def client_ip(request):
+    meta = getattr(request, "META", {})
+    return meta.get("REMOTE_ADDR", "-")
+
+
+def log_client_error(status_code, context):
+    """Логує помилку клієнта: метод, шлях, статус, id користувача та IP.
+
+    Тіло запиту, заголовки та токени не логуються, щоб не записати паролі й секрети.
+    """
+    request = context.get("request")
+    user = getattr(request, "user", None)
+    user_id = user.pk if getattr(user, "is_authenticated", False) else None
+    logger.log(
+        LOG_LEVELS.get(status_code, logging.WARNING),
+        "%s %s -> %s (user_id=%s, ip=%s)",
+        getattr(request, "method", "-"),
+        getattr(request, "path", "-"),
+        status_code,
+        user_id,
+        client_ip(request),
+    )
+
+
 def api_exception_handler(exc, context):
+    response = build_response(exc, context)
+    if response.status_code < 500:  # помилки 5xx вже залоговано через logger.exception
+        log_client_error(response.status_code, context)
+    return response
+
+
+def build_response(exc, context):
     set_rollback()
 
     if isinstance(exc, (Http404, ObjectDoesNotExist)):
