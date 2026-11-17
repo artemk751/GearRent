@@ -91,7 +91,6 @@ class RegisterSerializer(serializers.ModelSerializer):
                 {"password_confirm": "Паролі не збігаються."}
             )
 
-        # Складність пароля перевіряється валідаторами з AUTH_PASSWORD_VALIDATORS
         candidate = User(
             username=attrs.get("username", ""),
             email=attrs.get("email", ""),
@@ -106,7 +105,6 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop("password_confirm")
-        # create_user зберігає пароль лише у захешованому вигляді
         return User.objects.create_user(**validated_data)
 
 

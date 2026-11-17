@@ -22,8 +22,6 @@ ERROR_CODES = {
     status.HTTP_500_INTERNAL_SERVER_ERROR: "server_error",
 }
 
-# Рівні логування для відповідей з помилкою: проблеми безпеки та конфлікти даних —
-# WARNING, звичайні помилки клієнта (валідація, 404, 405) — INFO
 LOG_LEVELS = {
     status.HTTP_400_BAD_REQUEST: logging.INFO,
     status.HTTP_401_UNAUTHORIZED: logging.WARNING,
@@ -67,10 +65,6 @@ def client_ip(request):
 
 
 def log_client_error(status_code, context):
-    """Логує помилку клієнта: метод, шлях, статус, id користувача та IP.
-
-    Тіло запиту, заголовки та токени не логуються, щоб не записати паролі й секрети.
-    """
     request = context.get("request")
     user = getattr(request, "user", None)
     user_id = user.pk if getattr(user, "is_authenticated", False) else None
@@ -87,7 +81,7 @@ def log_client_error(status_code, context):
 
 def api_exception_handler(exc, context):
     response = build_response(exc, context)
-    if response.status_code < 500:  # помилки 5xx вже залоговано через logger.exception
+    if response.status_code < 500: 
         log_client_error(response.status_code, context)
     return response
 

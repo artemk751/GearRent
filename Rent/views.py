@@ -56,7 +56,6 @@ class ListCreateView(APIView):
     serializer_class = None
 
     def get_permissions(self):
-        # Перегляд відкритий усім, створення — лише для авторизованих
         if self.request.method in SAFE_METHODS:
             return [AllowAny()]
         return [IsAuthenticated()]
@@ -87,8 +86,6 @@ class DetailView(APIView):
     label = ""
 
     def get_permissions(self):
-        # Перегляд відкритий усім, редагування — для авторизованих,
-        # видалення — лише для адміністраторів
         if self.request.method in SAFE_METHODS:
             return [AllowAny()]
         if self.request.method == "DELETE":

@@ -79,7 +79,6 @@ USERS_TAG = "Користувачі"
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
-    # Без автентифікації: застарілий токен у заголовку не має ламати реєстрацію
     authentication_classes = []
 
     def create(self, request, *args, **kwargs):
@@ -128,7 +127,7 @@ class LoginView(TokenObtainPairView):
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
-        # Невдалі спроби входу логуються в обробнику помилок (WARNING, статус 401)
+
         logger.info("Успішний вхід: user_id=%s", response.data["user"]["id"])
         return response
 
