@@ -11,8 +11,6 @@ User = get_user_model()
 
 class ApiTestCase(APITestCase):
     def setUp(self):
-        # Записи (POST/PUT/PATCH/DELETE) потребують авторизації, тому за замовчуванням
-        # тести виконуються від імені адміністратора
         self.admin = User.objects.create_superuser(
             "admin", "admin@example.com", "Adm1n!Pass-2026"
         )
