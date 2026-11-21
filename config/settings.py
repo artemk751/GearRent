@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 
+from decouple import config
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -80,6 +82,20 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
+DB_ENGINE = config("DB_ENGINE", default="django.db.backends.sqlite3")
+DB_NAME = config("DB_NAME", default="db.sqlite3")
+
+DATABASES = {
+    "default": {
+        "ENGINE": DB_ENGINE,
+        "NAME": BASE_DIR / DB_NAME if "sqlite" in DB_ENGINE else DB_NAME,
+        "USER": config("DB_USER", default=""),
+        "PASSWORD": config("DB_PASSWORD", default=""),
+        "HOST": config("DB_HOST", default=""),
+        "PORT": config("DB_PORT", default=""),
+    }
+}
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -95,6 +111,7 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SIMPLE_JWT = {
@@ -104,6 +121,21 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
+SPECTACULAR_SETTINGS = {
+    "TITLE": "GearRent API",
+    "DESCRIPTION": (
+        "API платформи оренди спорядження.\n\n"
+        "Автентифікація: JWT. Отримайте токени через `POST /api/v1/auth/login` "
+        "і передавайте access-токен у заголовку `Authorization: Bearer <token>` "
+        "(у Swagger UI — кнопка **Authorize**). "
+        'Усі помилки мають формат `{"error": {"code", "message", "details"}}`.'
+    ),
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SCHEMA_PATH_PREFIX": "/api/v1",
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SWAGGER_UI_SETTINGS": {"persistAuthorization": True},
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
@@ -155,4 +187,35 @@ MAILERS = {
     "default": {
         "BACKEND": "django.core.mail.backends.console.EmailBackend",
     },
+}
+
+LOG_LEVEL = config("LOG_LEVEL", default="INFO").upper()
+LOG_FILE = config("LOG_FILE", default="")  # порожнє значення = лише консоль
+
+_log_handlers = ["console"]
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{asctime} {levelname} [{name}] {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "verbose"},
+    },
+}
+if LOG_FILE:
+    LOGGING["handlers"]["file"] = {
+        "class": "logging.handlers.RotatingFileHandler",
+        "filename": BASE_DIR / LOG_FILE,
+        "maxBytes": 1_000_000,
+        "backupCount": 3,
+        "encoding": "utf-8",
+        "formatter": "verbose",
+    }
+    _log_handlers.append("file")
+LOGGING["loggers"] = {
+    app: {"handlers": _log_handlers, "level": LOG_LEVEL} for app in ("rent", "accounts")
 }

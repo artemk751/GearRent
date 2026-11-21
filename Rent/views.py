@@ -1,5 +1,8 @@
+import logging
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import (
@@ -11,6 +14,15 @@ from rest_framework.permissions import (
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .docs import (
+    BRAND_TAG,
+    CATEGORY_TAG,
+    named_detail_docs,
+    named_list_docs,
+    product_detail_docs,
+    product_list_docs,
+    related_products_docs,
+)
 from .exceptions import ConflictError
 from .models import Brand, Category, Product
 from .serializers import (
@@ -19,6 +31,8 @@ from .serializers import (
     ProductSerializer,
 )
 from .utils import products_count_text
+
+logger = logging.getLogger(__name__)
 
 SORT_FIELDS = (
     "id",
@@ -56,7 +70,13 @@ class ListCreateView(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        instance = serializer.save()
+        logger.info(
+            "Створено %s id=%s (user_id=%s)",
+            self.model.__name__,
+            instance.pk,
+            request.user.pk,
+        )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -90,6 +110,13 @@ class DetailView(APIView):
         serializer = self.serializer_class(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        logger.info(
+            "Оновлено %s id=%s partial=%s (user_id=%s)",
+            self.model.__name__,
+            instance.pk,
+            partial,
+            request.user.pk,
+        )
         return Response(serializer.data)
 
     def put(self, request, pk):
@@ -101,7 +128,14 @@ class DetailView(APIView):
     def delete(self, request, pk):
         instance = self.get_instance(pk)
         self.check_can_delete(instance)
+        instance_id = instance.pk
         instance.delete()
+        logger.info(
+            "Видалено %s id=%s (user_id=%s)",
+            self.model.__name__,
+            instance_id,
+            request.user.pk,
+        )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -137,12 +171,14 @@ def parse_bool_param(params, name):
     raise ValidationError({name: ["Допустимі значення: true або false."]})
 
 
+@extend_schema_view(**product_list_docs(ProductSerializer))
 class ProductListView(ListCreateView):
     model = Product
     serializer_class = ProductSerializer
 
     def get_queryset(self):
         params = self.request.query_params
+        logger.debug("Фільтри каталогу: %s", dict(params))
         queryset = Product.objects.select_related("category", "brand")
 
         search = params.get("search", "").strip()
@@ -172,6 +208,7 @@ class ProductListView(ListCreateView):
         return queryset
 
 
+@extend_schema_view(**product_detail_docs(ProductSerializer))
 class ProductDetailView(DetailView):
     model = Product
     serializer_class = ProductSerializer
@@ -181,11 +218,30 @@ class ProductDetailView(DetailView):
         return Product.objects.select_related("category", "brand")
 
 
+@extend_schema_view(
+    **named_list_docs(
+        CATEGORY_TAG,
+        CategorySerializer,
+        list_summary="Список категорій",
+        create_summary="Створити категорію",
+    )
+)
 class CategoryListView(ListCreateView):
     model = Category
     serializer_class = CategorySerializer
 
 
+@extend_schema_view(
+    **named_detail_docs(
+        CATEGORY_TAG,
+        CategorySerializer,
+        label="категорії",
+        retrieve="Деталі категорії",
+        replace="Повністю оновити категорію",
+        update="Частково оновити категорію",
+        delete="Видалити категорію",
+    )
+)
 class CategoryDetailView(DetailView):
     model = Category
     serializer_class = CategorySerializer
@@ -202,16 +258,43 @@ class CategoryDetailView(DetailView):
             )
 
 
+@extend_schema_view(
+    **related_products_docs(
+        CATEGORY_TAG,
+        ProductSerializer,
+        summary="Товари категорії",
+        label="категорії",
+    )
+)
 class CategoryProductsView(RelatedProductsView):
     parent_model = Category
     label = "Категорія"
 
 
+@extend_schema_view(
+    **named_list_docs(
+        BRAND_TAG,
+        BrandSerializer,
+        list_summary="Список брендів",
+        create_summary="Створити бренд",
+    )
+)
 class BrandListView(ListCreateView):
     model = Brand
     serializer_class = BrandSerializer
 
 
+@extend_schema_view(
+    **named_detail_docs(
+        BRAND_TAG,
+        BrandSerializer,
+        label="бренду",
+        retrieve="Деталі бренду",
+        replace="Повністю оновити бренд",
+        update="Частково оновити бренд",
+        delete="Видалити бренд",
+    )
+)
 class BrandDetailView(DetailView):
     model = Brand
     serializer_class = BrandSerializer
@@ -228,11 +311,20 @@ class BrandDetailView(DetailView):
             )
 
 
+@extend_schema_view(
+    **related_products_docs(
+        BRAND_TAG,
+        ProductSerializer,
+        summary="Товари бренду",
+        label="бренду",
+    )
+)
 class BrandProductsView(RelatedProductsView):
     parent_model = Brand
     label = "Бренд"
 
 
+@extend_schema(exclude=True)
 class ApiNotFoundView(APIView):
     def initial(self, request, *args, **kwargs):
         raise NotFound(
